@@ -4,6 +4,7 @@ import pandas as pd
 from requests import ConnectionError
 from package.config import my_cursor, my_db
 from datetime import datetime
+import time, sys
 
 
 def export_to_excel(products, file_name="products.xlsx"):
@@ -11,7 +12,7 @@ def export_to_excel(products, file_name="products.xlsx"):
     df.to_excel(file_name)
 
 
-def handle_elevenia(target_url, header_url):
+def handle_elevenia(target_url, category, header_url):
     try:
         page = requests.get(target_url, headers=header_url)
     except ConnectionError as err:
@@ -40,7 +41,8 @@ def handle_elevenia(target_url, header_url):
                            'price': price,
                            'discount': discount,
                            'review': review,
-                           'rating': rating
+                           'rating': rating,
+                           'category': category
                            })
 
     for top in top100:
@@ -65,3 +67,11 @@ def insert_and_get_fkey():
     return last_foreign_key_val
 
 
+# Animate Loading
+def loading_animation(process):
+    while process.isAlive():
+        chars = "/—\|"
+        for char in chars:
+            sys.stdout.write('\r' + 'Extracting ' + char)
+            time.sleep(.1)
+            sys.stdout.flush()
